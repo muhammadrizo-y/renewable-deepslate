@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "net.muhammadrizo.renewable_deepslate.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "FluidBlockMixin",
+    "LavaFluidMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}

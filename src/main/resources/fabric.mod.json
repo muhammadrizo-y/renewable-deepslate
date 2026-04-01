@@ -1,0 +1,26 @@
+{
+	"schemaVersion": 1,
+	"id": "renewable_deepslate",
+	"version": "${version}",
+	"name": "Renewable Deepslate",
+	"description": "Replace water and lava generating Stone and Cobblestone with Deepslate and Cobbled Deepslate if under Y level 0",
+	"authors": [
+		"Muhammadrizo"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/renewable-deepslate",
+		"sources": "https://github.com/muhammadrizo-y/renewable-deepslate"
+	},
+	"license": "MIT",
+	"icon": "assets/renewable_deepslate/icon.png",
+	"environment": "server",
+	"entrypoints": {},
+	"mixins": [
+		"renewable_deepslate.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.18.5",
+		"minecraft": "~1.21.10",
+		"java": ">=21"
+	}
+}
