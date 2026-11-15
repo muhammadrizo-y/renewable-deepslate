@@ -1,48 +1,49 @@
 package net.muhammadrizo.renewable_deepslate.mixin;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FluidBlock;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(FluidBlock.class)
+@Mixin(LiquidBlock.class)
 public class FluidBlockMixin {
     @Inject(
-            method = "receiveNeighborFluids",
+            method = "shouldSpreadLiquid(Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)Z",
             at = @At("HEAD"),
             cancellable = true
     )
-    private void onReceiveNeighborFluids(World world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
-        if (!state.getFluidState().isIn(FluidTags.LAVA)) return;
+    private void onShouldSpreadLiquid(Level world, BlockPos pos, BlockState state, CallbackInfoReturnable<Boolean> cir) {
+        if (!state.getFluidState().is(FluidTags.LAVA)) return;
         if (pos.getY() >= 0) return;
 
-        boolean isSoulSoil = world.getBlockState(pos.down()).isOf(Blocks.SOUL_SOIL);
+        boolean isSoulSoil = world.getBlockState(pos.below()).is(Blocks.SOUL_SOIL);
 
-        for (Direction direction : FluidBlock.FLOW_DIRECTIONS) {
-            BlockPos neighborPos = pos.offset(direction.getOpposite());
+        for (Direction direction : LiquidBlock.POSSIBLE_FLOW_DIRECTIONS) {
+            BlockPos neighborPos = pos.relative(direction.getOpposite());
 
-            if (world.getFluidState(neighborPos).isIn(FluidTags.WATER)) {
-                Block block = world.getFluidState(pos).isStill()
+            if (world.getFluidState(neighborPos).is(FluidTags.WATER)) {
+                Block block = world.getFluidState(pos).isSource()
                         ? Blocks.OBSIDIAN
                         : Blocks.COBBLED_DEEPSLATE;
-                world.setBlockState(pos, block.getDefaultState());
+                world.setBlockAndUpdate(pos, block.defaultBlockState());
 
-                world.syncWorldEvent(net.minecraft.world.WorldEvents.LAVA_EXTINGUISHED, pos, 0);
+                // Vanilla has no named constant for this in Mojmap names; LiquidBlock#fizz uses the literal 1501 (yarn: WorldEvents.LAVA_EXTINGUISHED).
+                world.levelEvent(1501, pos, 0);
                 cir.setReturnValue(false);
                 return;
             }
 
-            if (isSoulSoil && world.getBlockState(neighborPos).isOf(Blocks.BLUE_ICE)) {
-                world.setBlockState(pos, Blocks.BASALT.getDefaultState());
-                world.syncWorldEvent(net.minecraft.world.WorldEvents.LAVA_EXTINGUISHED, pos, 0);
+            if (isSoulSoil && world.getBlockState(neighborPos).is(Blocks.BLUE_ICE)) {
+                world.setBlockAndUpdate(pos, Blocks.BASALT.defaultBlockState());
+                world.levelEvent(1501, pos, 0);
                 cir.setReturnValue(false);
                 return;
             }

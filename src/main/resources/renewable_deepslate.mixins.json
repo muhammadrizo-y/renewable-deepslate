@@ -1,7 +1,7 @@
 {
   "required": true,
+  "minVersion": "0.8",
   "package": "net.muhammadrizo.renewable_deepslate.mixin",
-  "compatibilityLevel": "JAVA_21",
   "mixins": [
     "FluidBlockMixin",
     "LavaFluidMixin"

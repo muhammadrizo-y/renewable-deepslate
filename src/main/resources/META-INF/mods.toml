@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="*"
+license="MIT"
+issueTrackerURL="https://github.com/muhammadrizo-y/renewable-deepslate/issues"
+logoFile="assets/renewable_deepslate/icon.png"
+
+[[mods]]
+modId="renewable_deepslate"
+version="${version}"
+displayName="Renewable Deepslate"
+displayURL="https://modrinth.com/mod/renewable-deepslate"
+authors="Muhammadrizo"
+description='''Replace water and lava generating Stone and Cobblestone with Deepslate and Cobbled Deepslate if under Y level 0
+'''
+
+[[dependencies.renewable_deepslate]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[26.3]"
+    ordering="NONE"
+    side="BOTH"

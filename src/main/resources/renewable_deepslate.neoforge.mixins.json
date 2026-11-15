@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.muhammadrizo.renewable_deepslate.mixin.platform.neoforge",
+  "mixins": [
+    "NeoForgeCanInteractMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+	}
+}

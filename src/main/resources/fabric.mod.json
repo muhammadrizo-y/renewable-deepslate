@@ -13,14 +13,14 @@
 	},
 	"license": "MIT",
 	"icon": "assets/renewable_deepslate/icon.png",
-	"environment": "server",
+	"environment": "*",
 	"entrypoints": {},
 	"mixins": [
 		"renewable_deepslate.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.18.5",
-		"minecraft": "~1.21.10",
-		"java": ">=21"
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25"
 	}
 }

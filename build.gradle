@@ -1,5 +1,5 @@
 plugins {
-	id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
+	id 'net.fabricmc.fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -18,33 +18,43 @@ repositories {
 	// for more information about repositories.
 }
 
-fabricApi {
-	configureDataGeneration {
-		client = true
-	}
-}
-
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 	
+}
+
+// Compile-only stubs of the Forge/NeoForge @Mod annotations. The real annotations live in
+// the loader's javafmllanguage/fancymodloader artifacts, which are not on this project's
+// classpath. The stubs let the single-jar build compile per-loader @Mod entrypoint classes
+// against the exact annotation descriptors both loaders expect; the stub classes themselves
+// are never packaged (only sourceSets.main.output goes into the jar), and at runtime the
+// annotation resolves against the loader's own copy.
+sourceSets {
+	stubs {
+		java {
+			srcDir 'src/stubs/java'
+		}
+	}
+	main {
+		compileClasspath += sourceSets.stubs.output
+	}
 }
 
 processResources {
 	inputs.property "version", project.version
 
-	filesMatching("fabric.mod.json") {
+	filesMatching(["fabric.mod.json", "META-INF/mods.toml", "META-INF/neoforge.mods.toml"]) {
 		expand "version": inputs.properties.version
 	}
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
@@ -53,12 +63,19 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
 	inputs.property "archivesName", project.base.archivesName
+
+	manifest {
+		// Forge (and NeoForge's fallback path) discover mixin configs via this ModLauncher
+		// manifest attribute. The platform-specific configs have targets that only exist on
+		// their respective loaders, so listing all of them here is safe everywhere.
+		attributes('MixinConfigs': 'renewable_deepslate.mixins.json,renewable_deepslate.forge.mixins.json,renewable_deepslate.neoforge.mixins.json')
+	}
 
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}"}
